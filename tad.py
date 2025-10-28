@@ -41,7 +41,7 @@ class Colecao:
 
     def redimensiona(self, tamanho_necessario: int) -> None:
         '''
-        Método auxiliar "privado" para aumentar o tamanho do array estático
+        Método para aumentar o tamanho do array estático
         quando uma figurinha com número maior que o tamanho atual é adicionada.
         '''
         tamanho_atual = len(self.figurinhas)
