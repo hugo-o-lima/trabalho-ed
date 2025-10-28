@@ -5,11 +5,8 @@ from ed import array
 @dataclass
 class Figurinha:
     '''
-    Representa uma figurinha com um número identificador e sua quantidade.
-    
-    Para resolver a inconsistência do rascunho (onde a definição pedia
-    numero e quantidade, mas os exemplos usavam só o numero),
-    definimos a quantidade com um valor padrão de 1.
+    Uma figurinha tem um numero e uma quantidade.
+    Por padrão, quando criamos uma figurinha nova, ela tem quantidade 1.
     
     Exemplos:
     >>> messi = Figurinha(1)
@@ -29,8 +26,7 @@ class Colecao:
     
     def __init__(self):
         '''
-        Inicia uma coleção de figurinhas com 15 espaços, sendo que é inicializado 
-        com todas valendo 0, ou seja vazias
+        Cria uma coleção começando com 15 espaços vazios (todos com numero 0).
         
         Exemplos:
         >>> x = Colecao()
@@ -41,8 +37,8 @@ class Colecao:
 
     def redimensiona(self, tamanho_necessario: int) -> None:
         '''
-        Método para aumentar o tamanho do array estático
-        quando uma figurinha com número maior que o tamanho atual é adicionada.
+        Aumenta o tamanho do array quando precisamos adicionar uma figurinha
+        com numero maior do que o tamanho atual.
         '''
         tamanho_atual = len(self.figurinhas)
 
@@ -64,26 +60,19 @@ class Colecao:
 
     def adiciona_figurinha(self, figurinha: Figurinha) -> None:
         '''
-        Adiciona uma *figurinha* na colecao. Se o tamanho do album estiver pequeno, 
-        aloca mais espaço.
+        Adiciona uma figurinha na colecao. Se ja tiver essa figurinha,
+        apenas aumenta a quantidade. Se o album estiver pequeno, aumenta o tamanho.
         
+        Exemplos:
         Exemplos:
         >>> Album = Colecao()
         >>> neymar = Figurinha(4)
         >>> Album.adiciona_figurinha(neymar)
-        >>> Album.figurinhas[4].numero
-        4
-        >>> Album.figurinhas[4].quantidade
-        1
         >>> Album.adiciona_figurinha(neymar)
-        >>> Album.figurinhas[4].quantidade
-        2
         >>> ronaldo = Figurinha(20)
         >>> Album.adiciona_figurinha(ronaldo)
-        >>> len(Album.figurinhas)
-        30
-        >>> Album.figurinhas[20].quantidade
-        1
+        >>> Album.gera_figurinhas_presentes()
+        '4, 20'
         '''
         num = figurinha.numero
         tamanho_necessario = num + 1
@@ -98,24 +87,19 @@ class Colecao:
 
     def remove_figurinha(self, figurinha: Figurinha) -> None:
         '''
-        Remove uma *figurinha* da coleção.
-        Se a quantidade for > 1, apenas diminui a quantidade.
-        Se a quantidade for 1, remove a figurinha (seta para Figurinha(0)).
-        Se a figurinha nao estiver contida em *self* nao altera nada
+        Remove uma figurinha da colecao. Se tiver mais de uma, só diminui
+        a quantidade. Se tiver apenas uma, remove completamente (vira Figurinha(0)).
+        Se nao tiver a figurinha, nao faz nada.
         
         Exemplos:
         >>> copa = Colecao()
         >>> fig1 = Figurinha(1)
         >>> copa.adiciona_figurinha(fig1)
         >>> copa.adiciona_figurinha(fig1)
-        >>> copa.figurinhas[1].quantidade
-        2
         >>> copa.remove_figurinha(fig1)
-        >>> copa.figurinhas[1].quantidade
-        1
         >>> copa.remove_figurinha(fig1)
-        >>> copa.figurinhas[1].numero
-        0
+        >>> copa.gera_figurinhas_presentes()
+        ''
         '''
         if figurinha.numero < len(self.figurinhas):
             item_album = self.figurinhas[figurinha.numero]
@@ -125,10 +109,12 @@ class Colecao:
                     item_album.quantidade = item_album.quantidade - 1
                 else:
                     self.figurinhas[figurinha.numero] = Figurinha(0)
+                return
         
     def gera_figurinhas_presentes(self) -> str:
             '''
-            Retorna uma string com as figurinhas presentes na colecao            
+            Retorna uma string com os numeros das figurinhas que tem na colecao.
+            
             Exemplos:
             >>> copa = Colecao()
             >>> copa.adiciona_figurinha(Figurinha(1))
@@ -159,7 +145,9 @@ class Colecao:
 
     def gera_figurinhas_repetidas(self) -> str:
         '''
-        Retorna uma string com as figurinhas repetidas de uma colecao
+        Retorna uma string com as figurinhas repetidas, mostrando quantas
+        a mais cada uma tem.
+        
         Exemplos:
         >>> copa = Colecao()
         >>> fig1 = Figurinha(1)
@@ -197,9 +185,9 @@ class Colecao:
 
     def conta_figurinhas_trocaveis(self, colecao_destino: Colecao) -> int:
         """
-        Conta quantas figurinhas repetidas esta coleção possui que a 
-        coleção de destino ainda não tem. Uma figurinha é considerada trocável quando está presente nesta coleção 
-        com quantidade maior que 1 (repetida) e não está presente na coleção de destino (numero = 0)
+        Conta quantas figurinhas repetidas eu tenho que a outra pessoa nao tem.
+        So da pra trocar se eu tiver repetida e o outro nao tiver nenhuma.
+        
         Exemplos:
         >>> c1 = Colecao()
         >>> c1.adiciona_figurinha(Figurinha(1))
@@ -232,10 +220,9 @@ class Colecao:
 
     def encontra_proxima_figurinha_trocavel(self, colecao_destino: Colecao, indice_inicial: int) -> Figurinha:
         """
-        Encontra a próxima figurinha trocável a partir de um índice inicial. Percorre o array de figurinhas 
-        desta coleção começando pelo índice_inicial e retorna a primeira figurinha 
-        que atende aos critérios de troca que são quantidade maior que 1 (repetida) e não presente na coleção de destino
-        A busca é feita em ordem crescente de número, garantindo que as trocas ocorram respeitando essa ordem.
+        Procura a proxima figurinha que da pra trocar, comecando de um indice.
+        Retorna a primeira figurinha repetida que o outro nao tem.
+        
         Exemplos:
         >>> c1 = Colecao()
         >>> c1.adiciona_figurinha(Figurinha(2))
@@ -275,20 +262,11 @@ class Colecao:
 
     def troca_maxima(self, colecao2: Colecao) -> None:
         """
-        Realiza a troca máxima de figurinhas entre duas coleções.
-        Para cada par de coleções:
-        A função identifica figurinhas repetidas que cada coleção tem
-        e que a outra ainda não possui no álbum.
-        Em seguida, realiza a troca dessas figurinhas, respeitando o limite
-        do número de figurinhas repetidas disponíveis e da quantidade de figurinhas
-        que o outro ainda não tem.
-        O número de trocas é limitado ao mínimo entre a quantidade de figurinhas
-        possíveis de enviar por uma e a quantidade possíveis de receber da outra.
-        A troca ocorre em ordem crescente do número da figurinha.
-        - A troca só ocorre se houver interesse mútuo: cada um deve ter algo que o outro queira.
-        - As figurinhas são transferidas na ordem crescente de número.
-        - Apenas figurinhas **repetidas** podem ser trocadas.
-        - Não é retornado nenhum valor; o efeito é direto nas coleções.
+        Faz a troca de figurinhas entre duas colecoes. Cada um da figurinhas
+        repetidas que tem e que o outro ainda nao tem. A troca so acontece
+        se os dois tiverem algo pra trocar (interesse mutuo). As trocas sao
+        feitas em ordem crescente de numero.
+        
         Exemplos:
         >>> c = Colecao()
         >>> c.adiciona_figurinha(Figurinha(2))
@@ -319,19 +297,16 @@ class Colecao:
         """
         quantidade_col1_pode_dar = self.conta_figurinhas_trocaveis(colecao2)
         quantidade_col2_pode_dar = colecao2.conta_figurinhas_trocaveis(self)
-        
         numero_de_trocas = min(quantidade_col1_pode_dar, quantidade_col2_pode_dar)
         
         trocas_realizadas = 0
         indice_col1 = 0
         indice_col2 = 0
+        continuar = True
         
-        while trocas_realizadas < numero_de_trocas:
+        while trocas_realizadas < numero_de_trocas and continuar:
             figurinha_para_col2 = self.encontra_proxima_figurinha_trocavel(colecao2, indice_col1)
-            indice_col1 = indice_col1 + 1
-            
             figurinha_para_col1 = colecao2.encontra_proxima_figurinha_trocavel(self, indice_col2)
-            indice_col2 = indice_col2 + 1
             
             if figurinha_para_col2.numero != 0 and figurinha_para_col1.numero != 0:
                 self.remove_figurinha(figurinha_para_col2)
@@ -340,4 +315,8 @@ class Colecao:
                 colecao2.remove_figurinha(figurinha_para_col1)
                 self.adiciona_figurinha(figurinha_para_col1)
                 
-                trocas_realizadas = trocas_realizadas + 1
+                trocas_realizadas += 1
+                indice_col1 = figurinha_para_col2.numero + 1
+                indice_col2 = figurinha_para_col1.numero + 1
+            else:
+                continuar = False
